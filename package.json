@@ -10,14 +10,18 @@
     "build-css": "tailwindcss -i ./src/app/globals.css -o ./src/app/output.css --watch"
   },
   "dependencies": {
+    "@react-email/components": "^0.3.3",
+    "bcryptjs": "^3.0.2",
     "mongoose": "^8.16.5",
     "next": "15.4.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "resend": "^4.7.0",
     "zod": "^4.0.14"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
