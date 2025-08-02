@@ -34,18 +34,18 @@ export interface User extends Document {
 
 }
 
-const UserSchema : Schema<User> = new Schema({
+const UserSchema: Schema<User> = new Schema({
     username: {
         type: String,
         required: [true, "Username is required"],
-        trim: true,
         unique: true,
+        trim: true,
     },
     email: {
         type: String,
         required: [true, "Email is required"],
         unique: true,
-        match: [/^\S+@\S+\.\S+$/, "Email is invalid"],
+        match: [/\S+@\S+\.\S+/, 'Email is invalid'],
     },
     password: {
         type: String,
