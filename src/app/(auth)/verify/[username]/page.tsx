@@ -47,7 +47,7 @@ const page = () => {
             });
 
             //now going to the sign-in page
-            router.replace('sign-in');
+            router.replace('/sign-in');
         } catch (error) {
             //if there is an error we will catch it and then show the error message
             const axiosError = error as AxiosError<any>;
