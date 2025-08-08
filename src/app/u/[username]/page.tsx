@@ -8,7 +8,6 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CardHeader, CardContent, Card } from '@/components/ui/card';
-// ❌ REMOVED: import { useCompletion } from 'ai/react';
 import {
   Form,
   FormControl,
@@ -32,14 +31,17 @@ const suggestedMessages = [
   "What's your dream job?",
   "What's your biggest achievement?",
   "What motivates you daily?",
-  "What's your favorite hobby?"
+  "What's your favorite hobby?",
+  "What's your favorite book?",
+  "What's the best advice you've received?",
+  "What's your biggest fear?",
+  "What makes you laugh the most?"
 ];
 
 export default function SendMessage() {
   const params = useParams<{ username: string }>();
   const username = params.username;
 
-  // ❌ REMOVED: AI completion logic
   const [currentMessages, setCurrentMessages] = useState(suggestedMessages);
 
   const form = useForm<z.infer<typeof messageSchema>>({
@@ -73,7 +75,7 @@ export default function SendMessage() {
       form.reset({ ...form.getValues(), content: '' });
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
-      toast.error(axiosError.response?.data.message ?? 'Failed to sent message', {
+      toast.error(axiosError.response?.data.message ?? 'Failed to send message', {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,

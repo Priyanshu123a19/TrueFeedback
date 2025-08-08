@@ -1,54 +1,52 @@
-//suare bracket forlder so it accepts the message id as a parameter
-//dynamic route
 import dbConnect from "@/lib/dbConnect";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
-import {User} from "next-auth";
 import userModel from "@/model/User";
+import { User } from "next-auth";
+import mongoose from "mongoose";
 
-//over here we are making the route for getting all the messages that the current user has got
+// ✅ FIXED: Correct Next.js 15 type signature
+export async function DELETE(
+  request: Request,
+  context: { params: Promise<{ messageid: string }> }
+) {
+  // ✅ FIXED: Await the params in Next.js 15
+  const { messageid } = await context.params;
+  
+  await dbConnect();
+  
+  const session = await getServerSession(authOptions);
+  const user: User = session?.user as User;
 
-export async function DELETE(request: Request, {params}: {params: {messageid: string}}) {
-    //algo
-    // 1. connect to the database
-    const messageId = params.messageid;
-    await dbConnect();
-    // 2. get the session of the user
-    const session = await getServerSession(authOptions);
-    const user: User = session?.user as User;
+  if (!session || !session.user) {
+    return Response.json({
+      success: false,
+      message: "You are not authenticated"
+    }, { status: 401 });
+  }
 
-    // 3. check if the user is authenticated
-    if (!session || !session.user) {
-        return Response.json({
-            success: false,
-            message: "You are not authenticated"
-        }, {status: 401}); // ✅ Fixed syntax
-    }
+  try {
+    const updatedResult = await userModel.updateOne(
+      { _id: user._id },
+      { $pull: { messages: { _id: messageid } } }
+    );
     
-
-    //now we write the logic to delete the message
-    try {
-       const updatedResult = await userModel.updateOne(
-            {_id: user._id},
-            {$pull: {messages: {_id: messageId}}}
-        );
-        if(updatedResult.modifiedCount === 0) {
-            return Response.json({
-                success: false,
-                message: "Message not found or already deleted"
-            }, {status: 404});
-        }else {
-            return Response.json({
-                success: true,
-                message: "Message deleted successfully"
-            }, {status: 200});
-        }
-    } catch (error) {
-        console.error("Error deleting message:", error);
-        return Response.json({
-            success: false,
-            message: "Internal Server Error"
-        }, {status: 500});
+    if (updatedResult.modifiedCount === 0) {
+      return Response.json({
+        success: false,
+        message: "Message not found or already deleted"
+      }, { status: 404 });
+    } else {
+      return Response.json({
+        success: true,
+        message: "Message deleted successfully"
+      }, { status: 200 });
     }
-   
+  } catch (error) {
+    console.error("Error deleting message:", error);
+    return Response.json({
+      success: false,
+      message: "Internal Server Error"
+    }, { status: 500 });
+  }
 }
