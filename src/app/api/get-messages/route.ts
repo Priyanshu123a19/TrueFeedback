@@ -22,6 +22,7 @@ export async function GET(req: Request) {
             message: "You are not authenticated"
         }, {status: 401}); // ✅ Fixed syntax
     }
+    
     // 4. get the user id from the session
     //here we have done this to make sure that we are using the correct user id
     //this will help us fight the errors in the future for the aggregation pipelines
@@ -37,26 +38,31 @@ export async function GET(req: Request) {
         //the third stage is to sort the messages by createdAt in descending order
         //the fourth stage is to group the messages by user id and push the messages into an array
         //this will give us the messages in the format that we want
-        const user = await userModel.aggregate([
+        const userData = await userModel.aggregate([
             { $match: { _id: userId } },
             {$unwind: "$messages"},
             {$sort: {"messages.createdAt": -1}},
             {$group: {_id: "$_id", messages: {$push: "$messages"}}}
         ])
 
-        if(!user || user.length === 0) {
+        // ✅ FIXED: Return empty array instead of 404 for no messages
+        if(!userData || userData.length === 0) {
             return Response.json({
-                success: false,
-                message: "No messages found"
-            }, {status: 404});
+                success: true,
+                message: "No messages found",
+                messages: [] // ✅ Return empty array to avoid 404 error
+            }, {status: 200}); // ✅ Changed to 200 status
         }
+        
         return Response.json({
             success: true,
+            message: "Messages fetched successfully", // ✅ Added success message
             //remember that this pipeline will return an array with one object ultimately i couldve had more than one user
             //but in this case we are only fetching the messages of the current user
             //so we are just getting the user at the 0th place
-            messages: user[0].messages
+            messages: userData[0].messages // ✅ Lowercase 'messages' to match dashboard expectation
         }, {status: 200});
+        
     } catch (error) {
         console.error("Error fetching messages:", error);
         return Response.json({

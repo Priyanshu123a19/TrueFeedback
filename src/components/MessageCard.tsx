@@ -31,12 +31,14 @@ type MessageCardProps = {
   onMessageDelete: (messageId: string) => void;
 }
 
-//if u dont define the props types then it will throw an error
-//now on the upper side we will define the props types
-const MessageCard = ({message,onMessageDelete}: MessageCardProps) => {
-    const handleDeleteConfirm = async()=>{
-      const response = await axios.delete<ApiResponse>(`/api/delete-message/${message._id}`)
-      //making a toast notification
+const MessageCard = ({message, onMessageDelete}: MessageCardProps) => {
+  const handleDeleteConfirm = async() => {
+    try {
+      console.log('Deleting message with ID:', message._id); // ✅ Debug log
+    const response = await axios.delete<ApiResponse>(`/api/delete-message/${message._id}`)
+    
+    console.log('Delete response:', response.data); // ✅ Debug log
+      
       if(response.data.success){
         toast.success(response.data.message, {
           position: "top-right",
@@ -46,7 +48,8 @@ const MessageCard = ({message,onMessageDelete}: MessageCardProps) => {
           pauseOnHover: true,
           draggable: true,
         });
-    }else{
+        onMessageDelete(message._id?.toString() || '');
+      } else {
         toast.error(response.data.message, {
           position: "top-right",
           autoClose: 5000,
@@ -56,35 +59,78 @@ const MessageCard = ({message,onMessageDelete}: MessageCardProps) => {
           draggable: true,
         });
       }
-      onMessageDelete(message._id?.toString() || '');
+    } catch (error) {
+      toast.error('Failed to delete message', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
+  }
+
   return (
-   <Card>
-  <CardHeader>
-    <CardTitle>Card Title</CardTitle>
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="destructive"><X className="w-5 h-5"/></Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDeleteConfirm}>Continue</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-    <CardDescription>Card Description</CardDescription>
-  </CardHeader>
-  <CardContent>
-  </CardContent>
-</Card>
+    <Card className="w-full">
+      <CardHeader>
+        <div className="flex justify-between items-start">
+          {/* ✅ FIXED: Use static title since Message interface doesn't have title */}
+          <CardTitle className="text-lg">
+            Anonymous Message
+          </CardTitle>
+          
+          {/* Delete button */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm">
+                <X className="w-4 h-4"/>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete this message.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+        
+        {/* ✅ FIXED: Display formatted received date */}
+        <CardDescription className="text-sm text-muted-foreground">
+          {message.createdAt 
+            ? new Date(message.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+            : 'Date not available'
+          }
+        </CardDescription>
+      </CardHeader>
+      
+      {/* ✅ FIXED: Display actual message content */}
+      <CardContent>
+        <p className="text-sm leading-relaxed">
+          {message.content || 'No content available'}
+        </p>
+      </CardContent>
+      
+      {/* Optional footer for additional actions */}
+      <CardFooter className="pt-0">
+        <div className="text-xs text-muted-foreground">
+          ID: {message._id?.toString().slice(-6) || 'Unknown'}
+        </div>
+      </CardFooter>
+    </Card>
   )
 }
 

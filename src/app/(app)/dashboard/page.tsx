@@ -74,7 +74,7 @@ const page = () => {
     try {
       const response =await axios.get<ApiResponse>('/api/get-messages');
       //now we will set the messages to the response data
-      setMessages(response.data.Messages || []);
+      setMessages(response.data.messages || []);
       if (refresh) {
         toast.success('Messages refreshed successfully', {
           position: "top-right",

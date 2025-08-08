@@ -1,74 +1,67 @@
-"use client";
-import Image from "next/image";
-import styles from "./page.module.css";
-import { toast } from 'react-toastify';
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Mail } from 'lucide-react'; // Assuming you have an icon for messages
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Autoplay from 'embla-carousel-autoplay';
+import messages from '@/messages.json';
+
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
 
 export default function Home() {
-  
-  const showSuccessToast = () => {
-    toast.success('🎉 Success! Toast is working perfectly!');
-  };
-
-  const showErrorToast = () => {
-    toast.error('❌ Error toast is working!');
-  };
-
-  const showInfoToast = () => {
-    toast.info('ℹ️ Info toast is working!');
-  };
-
-  const showWarningToast = () => {
-    toast.warning('⚠️ Warning toast is working!');
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">
-          Tailwind CSS Test
-        </h1>
-        <p className="text-gray-600 mb-6">
-          If you see colors and styling, Tailwind is working!
-        </p>
-        
-        {/* Original button */}
-        <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-md transition-colors mb-4 w-full">
-          Test Button
-        </button>
+    <>
+      {/* Main content */}
+      <main className="flex-grow flex flex-col items-center justify-center px-4 md:px-24 py-12 bg-gray-800 text-white">
+        <section className="text-center mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-5xl font-bold">
+            Dive into the World of Anonymous Feedback
+          </h1>
+          <p className="mt-3 md:mt-4 text-base md:text-lg">
+            True Feedback - Where your identity remains a secret.
+          </p>
+        </section>
 
-        {/* Toast test buttons */}
-        <div className="space-y-3">
-          <h2 className="text-xl font-semibold text-gray-700 mb-3">Test Toasts:</h2>
-          
-          <button 
-            onClick={showSuccessToast}
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors w-full"
-          >
-            🎉 Show Success Toast
-          </button>
-          
-          <button 
-            onClick={showErrorToast}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors w-full"
-          >
-            ❌ Show Error Toast
-          </button>
-          
-          <button 
-            onClick={showInfoToast}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors w-full"
-          >
-            ℹ️ Show Info Toast
-          </button>
-          
-          <button 
-            onClick={showWarningToast}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md transition-colors w-full"
-          >
-            ⚠️ Show Warning Toast
-          </button>
-        </div>
-      </div>
-    </div>
+        {/* Carousel for Messages */}
+        <Carousel
+          plugins={[Autoplay({ delay: 2000 })]}
+          className="w-full max-w-lg md:max-w-xl"
+        >
+          <CarouselContent>
+            {messages.map((message, index) => (
+              <CarouselItem key={index} className="p-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{message.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-col md:flex-row items-start space-y-2 md:space-y-0 md:space-x-4">
+                    <Mail className="flex-shrink-0" />
+                    <div>
+                      <p>{message.content}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {message.received}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </main>
+
+      {/* Footer */}
+      <footer className="text-center p-4 md:p-6 bg-gray-900 text-white">
+        © 2023 True Feedback. All rights reserved.
+      </footer>
+    </>
   );
 }

@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/context/AuthProvider";
 import ToastProvider from "@/lib/react-toastify/ToastProvider";
-import Navbar from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,13 +26,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-        <AuthProvider>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <AuthProvider>
           <ToastProvider>
             {children}
           </ToastProvider>
-      </body>
         </AuthProvider>
+      </body>
     </html>
   );
 }
