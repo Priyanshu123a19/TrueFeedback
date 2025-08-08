@@ -17,6 +17,7 @@ export async function middleware(request: NextRequest) {
             url.pathname === '/' // ✅ Only exact home page, not all paths
         )
     ){
+        console.log('Redirecting authenticated user to dashboard');
         return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 

@@ -2,7 +2,7 @@ import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
-import UserModel from '@/model/User';  // ✅ Check this path
+import UserModel from '@/model/User';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -32,7 +32,6 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Please verify your account before signing in");
           }
 
-          // ✅ FIXED: Convert to primitive string types
           const isPasswordValid = await bcrypt.compare(
             credentials.password.toString(), 
             user.password.toString()
@@ -74,6 +73,23 @@ export const authOptions: NextAuthOptions = {
         session.user.username = token.username;
       }
       return session;
+    },
+    // ✅ CRITICAL: Add this redirect callback
+    async redirect({ url, baseUrl }) {
+      console.log('Redirect callback - url:', url, 'baseUrl:', baseUrl);
+      
+      // After successful sign-in, redirect to dashboard
+      if (url === `${baseUrl}/sign-in` || url === baseUrl || url === '/') {
+        console.log('Redirecting to dashboard');
+        return `${baseUrl}/dashboard`;
+      }
+      
+      // For other URLs, ensure they're within the same domain
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      }
+      
+      return url.startsWith(baseUrl) ? url : baseUrl;
     },
   },
   pages: {
